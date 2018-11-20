@@ -7,11 +7,11 @@ authors = ["Jeremy Zheng <jitang.zheng@gmail.com>", "Margaret Ma <yananma0304@gm
 lto = true
 
 [dependencies]
+log = "0.4"
+log4rs = "0.8"
+env_logger = "0.5"
+clap = "2.32"
+error-chain = "0.12"
+chrono = "0.4"
 serialport = "3.1"
-serde = "1.0"
-
-[dependencies.pug]
-# path = "../../../saturn-xiv/pug"
-git = "https://github.com/saturn-xiv/pug.git"
-default-features = false
-features = ["sodium", "sqlite"]
+imgui = "0.0.21"
