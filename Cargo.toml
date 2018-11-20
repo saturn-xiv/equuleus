@@ -1,0 +1,17 @@
+[package]
+name = "equuleus"
+version = "0.1.0"
+authors = ["Jeremy Zheng <jitang.zheng@gmail.com>", "Margaret Ma <yananma0304@gmail.com>"]
+
+[profile.release]
+lto = true
+
+[dependencies]
+serialport = "3.1"
+serde = "1.0"
+
+[dependencies.pug]
+# path = "../../../saturn-xiv/pug"
+git = "https://github.com/saturn-xiv/pug.git"
+default-features = false
+features = ["sodium", "sqlite"]

@@ -1,2 +1,3 @@
-# axis
-A C++ Free High Performance Web Development Framework.
+# equuleus
+
+An open source cross-platform serial port emulator.
