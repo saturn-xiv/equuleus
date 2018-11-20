@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::fs::{self, DirEntry, File};
 use std::io::{prelude::*, BufReader};
 use std::os::unix::prelude::*;
@@ -10,6 +11,38 @@ use serialport::{open_with_settings, posix::TTYPort, SerialPort, SerialPortSetti
 
 use super::errors::Result;
 
+lazy_static! {
+    pub static ref BaudRate: Vec<u32> = vec![1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200];
+    pub static ref DataBits: BTreeMap<&'static str, &'static str> = {
+        let mut items = BTreeMap::new();
+        items.insert("Five", "5 bits per character");
+        items.insert("Six", "6 bits per character");
+        items.insert("Seven", "7 bits per character");
+        items.insert("Eight", "8 bits per character");
+        items
+    };
+    pub static ref FlowControl: BTreeMap<&'static str, &'static str> = {
+        let mut items = BTreeMap::new();
+        items.insert("None", "No flow control");
+        items.insert("Software", "Flow control using XON/XOFF bytes");
+        items.insert("Hardware", "Flow control using RTS/CTS signals");
+        items
+    };
+    pub static ref Parity: BTreeMap<&'static str, &'static str> = {
+        let mut items = BTreeMap::new();
+        items.insert("None", "No parity bit.");
+        items.insert("Odd", "Parity bit sets odd number of 1 bits");
+        items.insert("Even", "Parity bit sets even number of 1 bits");
+        items
+    };
+    pub static ref StopBits: BTreeMap<&'static str, &'static str> = {
+        let mut items = BTreeMap::new();
+        items.insert("One", "One stop bit");
+        items.insert("Two", "Two stop bit");
+        items
+    };
+}
+
 pub struct Pseudo {
     master: Arc<Mutex<TTYPort>>,
     slave: TTYPort,
@@ -19,14 +52,16 @@ impl Pseudo {
     pub fn new() -> Result<Self> {
         let (mut master, mut slave) = TTYPort::pair()?;
         info!(
-            "master tty fd: {}, path: {:?}",
+            "master tty fd: {}, path: {:?}, settings: {:?}",
             master.as_raw_fd(),
-            master.name()
+            master.name(),
+            slave.settings()
         );
         info!(
-            "slave  tty fd: {}, path: {:?}",
+            "slave  tty fd: {}, path: {:?}, settings: {:?}",
             slave.as_raw_fd(),
-            slave.name()
+            slave.name(),
+            slave.settings()
         );
         master.set_exclusive(false)?;
         slave.set_exclusive(false)?;
@@ -83,7 +118,7 @@ pub fn publisher<P: AsRef<Path>>(
     name: &String,
     settings: &SerialPortSettings,
     interval: Duration,
-    delay: Duration,
+    delay: Option<Duration>,
 ) -> Result<()> {
     let port = open_serial_port(name, settings)?;
     let port = Arc::new(Mutex::new(port));
@@ -94,14 +129,16 @@ pub fn publisher<P: AsRef<Path>>(
             Ok(mut port) => {
                 let len = port.write(it.as_bytes())?;
                 info!("send {} bytes: {}", len, it);
-                thread::sleep(delay);
-                let mut buf: Vec<u8> = vec![0; 1 << 10];
-                let len = port.read(buf.as_mut_slice())?;
-                info!(
-                    "receive {} bytes: {}",
-                    len,
-                    std::str::from_utf8(&buf[..len])?
-                );
+                if let Some(delay) = delay {
+                    thread::sleep(delay);
+                    let mut buf: Vec<u8> = vec![0; 1 << 10];
+                    let len = port.read(buf.as_mut_slice())?;
+                    info!(
+                        "receive {} bytes: {}",
+                        len,
+                        std::str::from_utf8(&buf[..len])?
+                    );
+                }
             }
             Err(e) => {
                 error!("failed in get serial port: {:?}", e);

@@ -9,5 +9,7 @@ fn main() {
         env_logger::init();
         error!("failed to parse log4rs.yml, {:?}", e);
     }
-    println!("Hello, world!");
+    if let Err(e) = equuleus::app::launch() {
+        error!("{:?}", e);
+    }
 }
