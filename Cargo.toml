@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Jeremy Zheng <jitang.zheng@gmail.com>", "Margaret Ma <yananma0304@gmail.com>"]
 description = "An open source cross-platform serial port emulator."
 homepage = "https://github.com/saturn-xiv/equuleus"
+license = "MIT"
 
 [profile.release]
 lto = true
