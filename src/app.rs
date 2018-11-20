@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use clap::{App, Arg, SubCommand};
+use pug::clap::{App, Arg, SubCommand};
 use serialport::{self, SerialPortSettings};
 
 use super::{
