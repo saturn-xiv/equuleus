@@ -10,10 +10,11 @@ license = "MIT"
 lto = true
 
 [dependencies]
+log = "0.4"
+log4rs = "0.8"
+env_logger = "0.5"
+clap = "2.32"
+error-chain = "0.12"
+lazy_static = "1.2"
+chrono = "0.4"
 serialport = "3.1"
-
-[dependencies.pug]
-# path = "../pug"
-git = "https://github.com/saturn-xiv/pug.git"
-default-features = false
-features = ["sodium", "sqlite"]
